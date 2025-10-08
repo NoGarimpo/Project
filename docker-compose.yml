@@ -1,0 +1,119 @@
+# Versão do Docker Compose (especifica compatibilidade com recursos)
+version: '3.8'
+
+# Define todos os serviços (containers) que serão executados
+services:
+  
+  # ========== SERVIÇO DO BANCO DE DADOS MYSQL ==========
+  mysql:
+    # Imagem oficial do MySQL versão 8.0 do Docker Hub
+    image: mysql:8.0
+    
+    # Nome personalizado do container (facilita identificação)
+    container_name: nogarimpo_mysql
+    
+    # Política de reinicialização: sempre reinicia se parar
+    restart: always
+    
+    # Variáveis de ambiente para configurar o MySQL
+    environment:
+      # Senha do usuário root (administrador do MySQL)
+      MYSQL_ROOT_PASSWORD: root123
+      
+      # Cria automaticamente um banco chamado 'nogarimpo'
+      MYSQL_DATABASE: nogarimpo
+      
+      # Cria um usuário específico para a aplicação
+      MYSQL_USER: nogarimpo_user
+      
+      # Senha do usuário da aplicação
+      MYSQL_PASSWORD: nogarimpo123
+    
+    # Mapeamento de portas: porta_host:porta_container
+    # Permite acessar MySQL do host na porta 3306
+    ports:
+      - "3306:3306"
+    
+    # Volumes para persistência de dados e inicialização
+    volumes:
+      # Volume nomeado para persistir dados do MySQL
+      # (dados não são perdidos quando container é removido)
+      - mysql_data:/var/lib/mysql
+      
+      # Monta o script SQL para ser executado na inicialização
+      # :ro = read-only (somente leitura)
+      - ./backend/database/script.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    
+    # Conecta este serviço à rede personalizada
+    networks:
+      - nogarimpo_network
+    
+    # Health check: verifica se MySQL está funcionando
+    healthcheck:
+      # Comando para testar se MySQL responde
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      
+      # Tempo limite para cada teste
+      timeout: 20s
+      
+      # Quantas tentativas antes de considerar "não saudável"
+      retries: 10
+
+  # ========== SERVIÇO DA API BACKEND ==========
+  backend:
+    # Constrói imagem a partir do Dockerfile na pasta ./backend
+    build: ./backend
+    
+    # Nome personalizado do container
+    container_name: nogarimpo_backend
+    
+    # Política de reinicialização
+    restart: always
+    
+    # Mapeia porta 8000 do host para porta 8000 do container
+    ports:
+      - "8000:8000"
+    
+    # Variáveis de ambiente para o Node.js
+    environment:
+      # Ambiente de desenvolvimento
+      - NODE_ENV=development
+      
+      # Configurações do banco (usa nome do serviço 'mysql' como host)
+      - DB_HOST=mysql
+      - DB_USER=nogarimpo_user
+      - DB_PASSWORD=nogarimpo123
+      - DB_NAME=nogarimpo
+      - DB_PORT=3306
+    
+    # Dependências: backend só inicia depois que MySQL estiver saudável
+    depends_on:
+      mysql:
+        # Aguarda MySQL passar no health check
+        condition: service_healthy
+    
+    # Conecta à mesma rede do MySQL
+    networks:
+      - nogarimpo_network
+    
+    # Volumes para desenvolvimento (hot reload)
+    volumes:
+      # Monta código fonte para refletir mudanças em tempo real
+      - ./backend:/api
+      
+      # Volume anônimo para node_modules (evita conflitos com host)
+      - /api/node_modules
+
+# ========== VOLUMES NOMEADOS ==========
+# Volumes que persistem dados mesmo após remover containers
+volumes:
+  # Volume para dados do MySQL (tabelas, registros, etc.)
+  mysql_data:
+
+# ========== REDES PERSONALIZADAS ==========
+# Define redes para comunicação entre containers
+networks:
+  # Rede bridge personalizada para isolamento
+  nogarimpo_network:
+    # Tipo de rede: bridge (padrão, permite comunicação entre containers)
+    driver: bridge
