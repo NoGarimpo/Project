@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import { conectar } from './database/conn.js'
+import userRouter from './routes/userRoute.js'
+import veiculoRouter from './routes/veiculoRoute.js'
 
 const app = express()
 const port = 8000
@@ -18,13 +20,15 @@ app.use(cors({
     origin: 'http://localhost:5173'
 }))
 
+app.use('/user', userRouter)
+app.use('/car', veiculoRouter)
 
 app.listen(port, async (error)=>{
     if(error){
         console.log(error)
         return
     }
-    console.log(`Servidor rodando em http://localhost:${port}`)
+    console.log(`Servidor rodando em http://localhost:${port} test`)
     
     // Conectar ao banco de dados
     await conectar()
