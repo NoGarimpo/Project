@@ -26,14 +26,28 @@ CREATE TABLE veiculo (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
+-- Criação da tabela de categorias
+CREATE TABLE categoria (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    descricao TEXT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Criação da tabela de serviços
 CREATE TABLE servico (
     id INT PRIMARY KEY AUTO_INCREMENT,
     descritivo VARCHAR(200) NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
+    id_categoria INT NULL,
     ativo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Chave estrangeira para categoria
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id) ON DELETE SET NULL
 );
 
 -- Criação da tabela de agendamentos
