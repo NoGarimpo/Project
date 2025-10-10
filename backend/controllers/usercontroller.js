@@ -81,4 +81,68 @@ export default class userController{
             res.status(500).json({ error: 'Erro interno do servidor' })
         }
     }
+    static async update(req,res){
+        try {
+            const {id} = req.params
+            const {nome, email, senha} = req.body
+            
+            if(!nome || !email){
+                return res.status(400).json({
+                    error: 'Nome e email são obrigatórios.'
+                })
+            }
+
+            if(!id || isNaN(id)){
+                return res.status(400).json({ 
+                    error: 'ID inválido' 
+                })
+            }
+
+            const userExist = await User.findOne(id)
+            if(!userExist){
+                return res.status(404).json({
+                    message: `Usuário com ID ${id} não encontrado`
+                })
+            }
+
+            const emailVerify = await User.emailexist(email)
+            if(emailVerify.length > 0 && emailVerify[0].id != id){
+                return res.status(409).json({
+                    error: 'Email já está em uso por outro usuário'
+                })
+            }
+
+            let finalPassword = userExist.senha
+            
+            if(senha && senha.trim() !== ''){
+                const isSamePassword = await bcrypt.compare(senha, userExist.senha)
+                
+                if(!isSamePassword){
+                    if(senha.length < 6){
+                        return res.status(400).json({
+                            error: 'Senha deve ter pelo menos 6 caracteres'
+                        })
+                    }
+                    
+                    const saltRounds = 12
+                    finalPassword = await bcrypt.hash(senha, saltRounds)
+                }
+            }
+ 
+            const updatedUser = await User.update(id, nome, email, finalPassword)
+
+            res.json({
+                message: 'Usuário atualizado com sucesso',
+                user: {
+                    nome,
+                    email
+                }
+            })
+
+        } catch (error) {
+            console.error('Erro no update:', error)
+            res.status(500).json({ error: 'Erro interno do servidor' })
+        }
+    }
+    
 }

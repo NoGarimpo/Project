@@ -3,11 +3,14 @@ import carController from "../controllers/carcontroller.js";
 
 const rota = Router()
 
+rota.get('/getCars', carController.getAll)
+
+// rota.post('/createCar', carController.create)
+
 rota.get('/getCar/:id', carController.getOne)
 
 rota.delete('/:id', carController.delete)
 
-rota.get('/getCars', carController.getAll)
-
+// rota.put('/:id', carController.update)
 
 export default rota
