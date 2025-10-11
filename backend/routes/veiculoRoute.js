@@ -5,12 +5,12 @@ const rota = Router()
 
 rota.get('/getCars', carController.getAll)
 
-// rota.post('/createCar', carController.create)
+rota.post('/createCar', carController.create)
 
 rota.get('/getCar/:id', carController.getOne)
 
 rota.delete('/:id', carController.delete)
 
-// rota.put('/:id', carController.update)
+rota.patch('/:id', carController.update)
 
 export default rota

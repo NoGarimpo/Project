@@ -1,32 +1,31 @@
-import { connection } from '../database/conn.js'
 import { User } from '../models/user.js'
 import bcrypt from 'bcryptjs'
 
 export default class userController{
     static async getAll(req,res){
         try{
-            const users = await User.findAll()
+            const users = await User.getAll()
             if(!users || users.length === 0){
-                return res.status(404).json({message: 'Nenhum usuário encontrado'})
+                return res.status(404).json({ message: 'Nenhum usuário encontrado' })
             }
             res.json(users)
         }
         catch(error){
-            res.status(500).json({ error: 'Erro interno do servidor' })
+            res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }
-    
+
     static async getOne(req,res){
         try{
             const { id } = req.params
             
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
-                    error: 'ID inválido' 
+                    message: 'ID inválido' 
                 })
             }
             
-            const user = await User.findOne(id)
+            const user = await User.getOne(id)
             
             if(!user){
                 return res.status(404).json({ 
@@ -36,23 +35,31 @@ export default class userController{
             
             res.json(user)
             
-        } catch(error){
-            res.status(500).json({ error: 'Erro interno do servidor' })
+        } 
+        catch(error){
+            res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }
+
     static async create(req,res){
         try{
             const {nome, email, senha} = req.body
             
             if(!nome || !email || !senha){
                 return res.status(400).json({
-                    error: 'Por favor preencha todos os campos.'
+                    message: 'Por favor preencha todos os campos.'
                 })
             }
             
+            if(nome.trim() === '' || email.trim() === '' || senha.trim() === ''){
+                return res.status(400).json({
+                    message: 'Digite corretamente os campos'
+                })
+            }
+
             if(senha.length < 6){
                 return res.status(400).json({
-                    error: 'Senha deve ter pelo menos 6 caracteres'
+                    message: 'Senha deve ter pelo menos 6 caracteres'
                 })
             }
             
@@ -64,41 +71,48 @@ export default class userController{
             res.status(201).json({
                 message: 'Usuário criado com sucesso',
                 user: {
-                    id: newUser.insertId,
                     nome,
                     email
                 }
             })
             
-        } catch(error){
+        } 
+        catch(error){
             
             if(error.code === 'ER_DUP_ENTRY') {
                 return res.status(409).json({
-                    error: 'Email já está em uso'
+                    message: 'Email já está em uso'
                 })
             }
             
-            res.status(500).json({ error: 'Erro interno do servidor' })
+            res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }
+
     static async update(req,res){
-        try {
+        try{
             const {id} = req.params
             const {nome, email, senha} = req.body
             
             if(!nome || !email){
                 return res.status(400).json({
-                    error: 'Nome e email são obrigatórios.'
+                    message: 'Nome e email são obrigatórios.'
+                })
+            }
+
+            if(nome.trim() === '' || email.trim() === '' || senha.trim() === ''){
+                return res.status(400).json({
+                    message: 'Digite corretamente os campos'
                 })
             }
 
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
-                    error: 'ID inválido' 
+                    message: 'ID inválido' 
                 })
             }
 
-            const userExist = await User.findOne(id)
+            const userExist = await User.getOne(id)
             if(!userExist){
                 return res.status(404).json({
                     message: `Usuário com ID ${id} não encontrado`
@@ -108,7 +122,7 @@ export default class userController{
             const emailVerify = await User.emailexist(email)
             if(emailVerify.length > 0 && emailVerify[0].id != id){
                 return res.status(409).json({
-                    error: 'Email já está em uso por outro usuário'
+                    message: 'Email já está em uso por outro usuário'
                 })
             }
 
@@ -120,7 +134,7 @@ export default class userController{
                 if(!isSamePassword){
                     if(senha.length < 6){
                         return res.status(400).json({
-                            error: 'Senha deve ter pelo menos 6 caracteres'
+                            message: 'Senha deve ter pelo menos 6 caracteres'
                         })
                     }
                     
@@ -139,10 +153,9 @@ export default class userController{
                 }
             })
 
-        } catch (error) {
-            console.error('Erro no update:', error)
-            res.status(500).json({ error: 'Erro interno do servidor' })
+        } 
+        catch(error){
+            res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }
-    
 }

@@ -3,6 +3,7 @@ import cors from 'cors'
 import { conectar } from './database/conn.js'
 import userRouter from './routes/userRoute.js'
 import veiculoRouter from './routes/veiculoRoute.js'
+import categoryRouter from './routes/categoryRoute.js'
 
 const app = express()
 const port = 8000
@@ -22,6 +23,7 @@ app.use(cors({
 
 app.use('/user', userRouter)
 app.use('/car', veiculoRouter)
+app.use('/category', categoryRouter)
 
 app.listen(port, async (error)=>{
     if(error){

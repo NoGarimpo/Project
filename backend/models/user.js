@@ -1,12 +1,12 @@
 import { connection } from '../database/conn.js'
 
 export class User {
-    static async findAll(){
+    static async getAll(){
         const [rows] = await connection.execute('SELECT * FROM usuario')
         return rows
     }
     
-    static async findOne(id){
+    static async getOne(id){
         const [data] = await connection.execute(
             'SELECT * FROM usuario WHERE id = ?', [id]
         )
