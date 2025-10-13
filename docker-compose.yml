@@ -43,6 +43,9 @@ services:
       # Monta o script SQL para ser executado na inicialização
       # :ro = read-only (somente leitura)
       - ./backend/database/script.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      
+      # Configuração MySQL para UTF-8
+      - ./backend/database/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     
     # Conecta este serviço à rede personalizada
     networks:
