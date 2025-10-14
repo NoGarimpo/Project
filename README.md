@@ -2,33 +2,6 @@
 
 Sistema de gerenciamento de veículos com backend Node.js e MySQL.
 
-**Pré-requisitos:** Apenas Docker e Docker Compose
-
-1. **Clone o repositório:**
-   ```bash
-   git clone <url-do-repositorio>
-   cd Project
-   ```
-
-2. **Execute uma das opções:**
-   
-   **Opção 1 (tudo em um comando):**
-   ```bash
-   docker-compose up --build
-   ```
-   
-   **Opção 2 (dois passos):**
-   ```bash
-   docker-compose build
-   docker-compose up
-   ```
-
-3. **Pronto!** 
-   - API: `http://localhost:8000`
-   - MySQL: `localhost:3306`
-   - Banco criado automaticamente
-   - Tabelas criadas automaticamente
-
 ##  Endpoints da API
 
 ### Veículos
