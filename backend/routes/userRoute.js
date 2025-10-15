@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "express"
 import userController from '../controllers/usercontroller.js'
 
 const rota = Router()

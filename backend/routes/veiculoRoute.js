@@ -1,5 +1,5 @@
-import { Router } from "express";
-import carController from "../controllers/carcontroller.js";
+import { Router } from "express"
+import carController from "../controllers/carcontroller.js"
 
 const rota = Router()
 

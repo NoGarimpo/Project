@@ -2,20 +2,20 @@ import { connection } from '../database/conn.js'
 
 export class User {
     static async getAll(){
-        const [rows] = await connection.execute('SELECT * FROM usuario')
+        const [rows] = await connection.execute('SELECT * FROM usuarios')
         return rows
     }
     
     static async getOne(id){
         const [data] = await connection.execute(
-            'SELECT * FROM usuario WHERE id = ?', [id]
+            'SELECT * FROM usuarios WHERE id = ?', [id]
         )
         return data[0]
     }
 
     static async create(nome,email,senha){
         const [data] = await connection.execute(
-            'INSERT INTO usuario (nome,email,senha) VALUES(?,?,?)',
+            'INSERT INTO usuarios (nome,email,senha) VALUES(?,?,?)',
             [nome, email, senha]
         )
         return data
@@ -23,7 +23,7 @@ export class User {
 
   static async update(id, nome, email, senha){
         const [data] = await connection.execute(
-            'UPDATE usuario SET nome = ?, email = ?, senha = ? WHERE id = ?',
+            'UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?',
             [nome, email, senha, id]
         )
         return data
@@ -31,7 +31,7 @@ export class User {
 
     static async emailexist(email){
         const [data] = await connection.execute(
-            'SELECT * from usuario WHERE email = ?',[email]
+            'SELECT * from usuarios WHERE email = ?',[email]
         )
         return data
     }

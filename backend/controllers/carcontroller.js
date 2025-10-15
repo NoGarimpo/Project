@@ -1,5 +1,6 @@
 import { Veiculo } from '../models/car.js'
 import { User } from '../models/user.js'
+import { Type } from "../models/veiculoType.js"
 
 export default class carController{
     static async getAll(req,res){
@@ -67,9 +68,9 @@ export default class carController{
 
     static async create(req,res){
         try{
-            const {marca,modelo,ano,placa,foto,id_usuario} = req.body
+            const {marca,modelo,ano,placa,foto,id_usuario,id_tipo} = req.body
             
-            if(!marca || !modelo || !ano || !placa || !id_usuario){
+            if(!marca || !modelo || !ano || !placa || !id_usuario || !id_tipo ){
                 return res.status(400).json({
                     message: 'Por favor preencha todos os campos obrigatórios.'
                 })
@@ -104,6 +105,14 @@ export default class carController{
                 }) 
             }
 
+            const typeVehicle = await Type.getOne(id_tipo)
+
+            if(!typeVehicle){
+                return res.status(404).json({
+                    message: 'tipo não encontrado'
+                })
+            }
+            
             const placaVerify = await Veiculo.placaExist(placaUpper)
             if(placaVerify && placaVerify.length > 0){
                 return res.status(409).json({
@@ -111,7 +120,7 @@ export default class carController{
                 }) 
             }
 
-            const newCar = await Veiculo.create(marca,modelo,anoInt,placaUpper,foto,id_usuario)
+            const newCar = await Veiculo.create(marca,modelo,anoInt,placaUpper,foto,id_usuario,id_tipo)
 
             res.status(201).json({
                 message: 'Veículo criado com sucesso',
@@ -187,7 +196,8 @@ export default class carController{
                 }
             })
 
-        } catch (error){
+        }
+         catch (error){
             res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }

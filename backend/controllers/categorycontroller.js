@@ -4,12 +4,12 @@ export default class categoryController{
     static async getAll(req,res){
         try{
             const rows = await Category.getAll()
-            if(!rows){
+            if(!rows || rows.length === 0){
                 res.status(404).json({
                     message:'nenhuma categoria encontrada'
                 })
             }
-            return res.json(rows)
+            res.json(rows)
         } 
         catch(error){
             res.status(500).json({ message: 'Erro interno do servidor' })

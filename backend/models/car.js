@@ -2,24 +2,24 @@ import { connection } from '../database/conn.js'
 
 export class Veiculo{
     static async getAll(){
-        const [rows] = await connection.execute('SELECT * FROM veiculo')
+        const [rows] = await connection.execute('SELECT * FROM veiculos')
         return rows
     }
     
     static async getOne(id){
-        const [data] = await connection.execute('SELECT * FROM veiculo WHERE id = ?', [id])
+        const [data] = await connection.execute('SELECT * FROM veiculos WHERE id = ?', [id])
         return data[0]
     }
     
     static async delete(id){
-        const [data] = await connection.execute('DELETE FROM veiculo WHERE id = ?', [id])
+        const [data] = await connection.execute('DELETE FROM veiculos WHERE id = ?', [id])
         return data
     }
 
-    static async create(marca,modelo,ano,placa,foto,id_usuario){
+    static async create(marca,modelo,ano,placa,foto,id_usuario,id_tipo){
         const [data] = await connection.execute(
-            'INSERT INTO veiculo(marca,modelo,ano,placa,foto,id_usuario) VALUES(?,?,?,?,?,?)',
-            [marca,modelo,ano,placa,foto,id_usuario]
+            'INSERT INTO veiculo(marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo) VALUES(?,?,?,?,?,?,?)',
+            [marca,modelo,ano,placa,foto,id_usuario,id_tipo]
         )
         return data
     }

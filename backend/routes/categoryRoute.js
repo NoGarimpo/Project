@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "express"
 import categoryController from '../controllers/categorycontroller.js'
 
 const rota = Router()

@@ -2,18 +2,18 @@ import { connection } from '../database/conn.js'
 
 export class Category{
     static async getAll(){
-        const [rows] = await connection.execute('SELECT * FROM categoria')
+        const [rows] = await connection.execute('SELECT * FROM categorias WHERE ativo = true')
         return rows
     }
 
     static async getOne(id){
-        const [data] = await connection.execute('SELECT * FROM categoria WHERE id = ?', [id])
+        const [data] = await connection.execute('SELECT * FROM categorias WHERE id = ?', [id])
         return data
     }
 
     static async create(nome,descricao){
         const [data] = await connection.execute(
-            'INSERT INTO categoria(nome,descricao) VALUES(?,?)',
+            'INSERT INTO categorias(nome,descricao) VALUES(?,?)',
             [nome,descricao]
         )
         return data
@@ -21,7 +21,7 @@ export class Category{
 
     static async update(id,ativo){
         const [data] = await connection.execute(
-            'UPDATE categoria SET ativo = ? WHERE id = ?', [ativo, id]
+            'UPDATE categorias SET ativo = ? WHERE id = ?', [ativo, id]
         )
         return data
     }
