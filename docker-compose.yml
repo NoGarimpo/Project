@@ -82,6 +82,9 @@ services:
       # Ambiente de desenvolvimento
       - NODE_ENV=development
       
+      # Porta da aplicação
+      - PORT=8000
+      
       # Configurações do banco (usa nome do serviço 'mysql' como host)
       - DB_HOST=mysql
       - DB_USER=nogarimpo_user

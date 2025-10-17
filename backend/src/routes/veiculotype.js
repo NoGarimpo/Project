@@ -1,5 +1,5 @@
 import { Router } from "express"
-import typeController from "../controllers/typecontroller"
+import typeController from "../controllers/typecontroller.js"
 
 const rota = Router()
 

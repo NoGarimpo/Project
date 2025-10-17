@@ -1,5 +1,5 @@
 import { Router } from "express"
-import appointmentController from "../controllers/appointmentcontroller"
+import appointmentController from "../controllers/appointmentcontroller.js"
 
 const rota = Router()
 

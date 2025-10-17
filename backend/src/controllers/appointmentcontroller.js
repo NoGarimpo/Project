@@ -1,4 +1,4 @@
-import { Appointment } from "../models/Appointment"
+import { Appointment } from "../models/Appointment.js"
 
 export default class appointmentController{
     static async getAll(req,res){
