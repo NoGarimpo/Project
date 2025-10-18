@@ -39,4 +39,29 @@ export default class serviceController{
             res.status(500).json({ message: 'Erro interno do servidor' })
         }
     }
+
+    static async getAllWithPrices(req,res){
+        try{
+            const { tipo_veiculo_id } = req.query
+
+            if(!tipo_veiculo_id || isNaN(tipo_veiculo_id)){
+                return res.status(400).json({ 
+                    message: 'tipo_veiculo_id é obrigatório' 
+                })
+            }
+
+            const rows = await Service.getAllWithPrices(tipo_veiculo_id)
+            
+            if(!rows || rows.length === 0){
+                return res.status(404).json({
+                    message:'nenhum serviço encontrado para este tipo de veículo'
+                })
+            }
+
+            return res.json(rows)
+        } 
+        catch(error){
+            res.status(500).json({ message: 'Erro interno do servidor' })
+        }
+    }
 }

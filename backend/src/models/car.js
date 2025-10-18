@@ -18,7 +18,7 @@ export class Veiculo{
 
     static async create(marca,modelo,ano,placa,foto,id_usuario,id_tipo){
         const [data] = await connection.execute(
-            'INSERT INTO veiculo(marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo) VALUES(?,?,?,?,?,?,?)',
+            'INSERT INTO veiculos(marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo) VALUES(?,?,?,?,?,?,?)',
             [marca,modelo,ano,placa,foto,id_usuario,id_tipo]
         )
         return data
@@ -26,7 +26,7 @@ export class Veiculo{
 
     static async update(id,placa,foto){
         const [data] = await connection.execute(
-            'UPDATE veiculo SET placa = ?, foto = ? WHERE id = ?',
+            'UPDATE veiculos SET placa = ?, foto = ? WHERE id = ?',
             [placa, foto, id]
         )
         return data
@@ -34,7 +34,7 @@ export class Veiculo{
 
     static async placaExist(placa){
         const [data] = await connection.execute(
-            'SELECT * from veiculo WHERE placa = ?',[placa]
+            'SELECT * from veiculos WHERE placa = ?',[placa]
         )
         return data[0]
     }
