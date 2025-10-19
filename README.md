@@ -1,46 +1,79 @@
-# Projeto NoGarimpo
+# NoGarimpo - Sistema de Agendamento Automotivo
 
-Sistema de gerenciamento de veículos com backend Node.js e MySQL.
+Sistema completo de gerenciamento e agendamento para serviços automotivos com backend Node.js, MySQL e Docker.
 
-##  Endpoints da API
+## 🚀 Funcionalidades
 
-### Veículos
-- `GET /car/getCars` - Listar todos os veículos
-- `GET /car/getCar/:id` - Buscar veículo por ID
-- `DELETE /car/:id` - Deletar veículo
+- **Gestão de Usuários** - Cadastro e gerenciamento de clientes
+- **Gestão de Veículos** - Cadastro com tipos (moto, carro, caminhonete, etc.)
+- **Gestão de Serviços** - Catálogo organizado por categorias
+- **Sistema de Preços Dinâmico** - Matriz de preços por tipo de veículo
+- **Agendamentos Completos** - Múltiplos serviços por agendamento
+- **Controle de Status** - Timestamps automáticos de início/fim
+- **Categorização** - Organização de serviços por tipo
 
-### Usuários
-- `GET /user/getUsers` - Listar todos os usuários
-- `GET /user/getUser/x` - Lista usuario especifico
-- `POST /user/createUser` - Cria usuário
+## 📋 Endpoints da API
 
-## 🐳 Docker
+### 👥 Usuários
+- `GET /user/getUsers` - Listar usuários
+- `GET /user/getUser/:id` - Buscar usuário específico
+- `POST /user/createUser` - Criar novo usuário
 
-**Opções para executar:**
+### 🚗 Veículos  
+- `GET /car/getCars` - Listar veículos
+- `GET /car/getCar/:id` - Buscar veículo específico
+- `POST /car/createCar` - Cadastrar veículo
+- `DELETE /car/:id` - Remover veículo
 
-**Tudo em um comando:**
-```bash
-docker-compose up --build
-```
+### 🛠️ Serviços
+- `GET /service/services` - Listar todos os serviços
+- `GET /service/services/com-precos?tipo_veiculo_id=X` - Serviços com preços
+- `GET /service/services/:id` - Buscar serviço específico
 
-**Ou em dois passos:**
-```bash
-docker-compose build    # Constrói as imagens
-docker-compose up       # Sobe os containers
-```
+### 🏷️ Categorias
+- `GET /category/categories` - Listar categorias
+- `GET /category/categories/:id` - Buscar categoria específica
 
-**Para parar:**
-```bash
-docker-compose down
-```
+### 🚙 Tipos de Veículo
+- `GET /vehicletype/types` - Listar tipos de veículo
+
+### � Preços
+- `GET /prices/price?servico_id=X&tipo_veiculo_id=Y` - Consultar preço específico
+
+### 📅 Agendamentos
+- `GET /appointment/appointments` - Listar todos os agendamentos
+- `GET /appointment/appointments/today` - Agendamentos do dia
+- `GET /appointment/appointments/:id` - Buscar agendamento específico
+- `POST /appointment/appointments` - Criar novo agendamento
+- `PATCH /appointment/appointments/:id` - Atualizar status
+
+
+## �️ Banco de Dados
+
+- **MySQL 8.0** com suporte UTF-8 completo
+- **Estrutura normalizada** com relacionamentos
+- **Índices otimizados** para performance
+- **Views personalizadas** para consultas complexas
 
 ## 🔧 Estrutura do Projeto
 
 ```
-backend/
-├── controllers/     # Controladores da API
-├── database/        # Conexão e scripts do banco
-├── models/          # Modelos de dados
-├── routes/          # Rotas da API
-└── index.js         # Arquivo principal
+Project/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/    # Lógica de negócio
+│   │   ├── models/         # Modelos de dados
+│   │   ├── routes/         # Rotas da API
+│   │   └── database/       # Conexão e scripts SQL
+│   ├── Dockerfile
+│   └── package.json
+├── docker-compose.yml
+└── README.md
 ```
+
+## 🛡️ Tecnologias
+
+- **Backend:** Node.js + Express
+- **Banco:** MySQL 8.0
+- **Containerização:** Docker + Docker Compose
+- **Arquitetura:** REST API + MVC Pattern
