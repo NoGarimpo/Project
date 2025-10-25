@@ -6,7 +6,6 @@ export class Appointment{
         return rows
     }
 
-    // 🔒 Método para buscar agendamentos de um usuário específico
     static async getByUserId(userId){
         const [rows] = await connection.execute(
             'SELECT * FROM agendamentos WHERE id_usuario = ? ORDER BY data_agendamento DESC',
@@ -28,10 +27,9 @@ export class Appointment{
 
     static async getOne(id){
         const [data] = await connection.execute('SELECT * FROM agendamentos WHERE id = ?', [id])
-        return data[0]  // Retorna o objeto direto, não array
+        return data[0]
     }
 
-    // 🔒 Método para buscar agendamento específico de um usuário
     static async getOneByUser(id, userId){
         const [data] = await connection.execute(
             'SELECT * FROM agendamentos WHERE id = ? AND id_usuario = ?',
@@ -50,7 +48,6 @@ export class Appointment{
         
         const agendamento_id = data.insertId
         
-        // 2. Inserir serviços (pega o id_preco_servico de cada um)
         for (let servico_id of servicos) {
             const [precoResult] = await connection.execute(
                 `SELECT ps.id FROM preco_servicos ps 
@@ -74,7 +71,6 @@ export class Appointment{
         let updateQuery = 'UPDATE agendamentos SET status = ?'
         let params = [status]
         
-        // Atualização automática dos timestamps
         if (status === 'em_andamento') {
             updateQuery += ', iniciado_em = NOW()'
         } else if (status === 'concluido') {

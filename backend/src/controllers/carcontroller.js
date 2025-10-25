@@ -54,7 +54,6 @@ export default class carController{
                 })
             }
 
-            // 🔒 Verifica se o carro pertence ao usuário
             const car = await Veiculo.getOneByUser(id, userId)
             if(!car){
                 return res.status(404).json({
