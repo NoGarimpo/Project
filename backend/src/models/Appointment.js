@@ -6,6 +6,15 @@ export class Appointment{
         return rows
     }
 
+    // 🔒 Método para buscar agendamentos de um usuário específico
+    static async getByUserId(userId){
+        const [rows] = await connection.execute(
+            'SELECT * FROM agendamentos WHERE id_usuario = ? ORDER BY data_agendamento DESC',
+            [userId]
+        )
+        return rows
+    }
+
     static async getToday(){
         const [rows] = await connection.execute(
             `
@@ -19,7 +28,16 @@ export class Appointment{
 
     static async getOne(id){
         const [data] = await connection.execute('SELECT * FROM agendamentos WHERE id = ?', [id])
-        return data
+        return data[0]  // Retorna o objeto direto, não array
+    }
+
+    // 🔒 Método para buscar agendamento específico de um usuário
+    static async getOneByUser(id, userId){
+        const [data] = await connection.execute(
+            'SELECT * FROM agendamentos WHERE id = ? AND id_usuario = ?',
+            [id, userId]
+        )
+        return data[0]
     }
 
     static async create(id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos, observacoes = null){

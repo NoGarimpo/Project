@@ -5,7 +5,10 @@ import { Type } from "../models/veiculoType.js"
 export default class carController{
     static async getAll(req,res){
         try{
-            const cars = await Veiculo.getAll()
+            const userId = req.user.id
+            
+            const cars = await Veiculo.getByUserId(userId)
+            
             if(!cars || cars.length === 0){
                 return res.status(404).json({ message: 'Nenhum veículo encontrado' })
             }
@@ -19,6 +22,7 @@ export default class carController{
     static async getOne(req,res){
         try{
             const {id} = req.params
+            const userId = req.user.id
 
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
@@ -26,10 +30,10 @@ export default class carController{
                 })
             }
 
-            const car = await Veiculo.getOne(id)
+            const car = await Veiculo.getOneByUser(id, userId)
             
             if(!car){
-                return res.status(404).json({message: `carro com id: ${id} não encontrado`})
+                return res.status(404).json({message: `Veículo não encontrado`})
             }
 
             res.json(car)
@@ -42,6 +46,7 @@ export default class carController{
     static async delete(req,res){
         try{
             const {id} = req.params
+            const userId = req.user.id
             
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
@@ -49,16 +54,17 @@ export default class carController{
                 })
             }
 
-            const car = await Veiculo.getOne(id)
+            // 🔒 Verifica se o carro pertence ao usuário
+            const car = await Veiculo.getOneByUser(id, userId)
             if(!car){
                 return res.status(404).json({
-                    message: `Veículo com id: ${id} não encontrado`
+                    message: `Veículo não encontrado`
                 })
             }
 
             await Veiculo.delete(id)
             res.status(200).json({
-                message: `Veículo com id: ${id} deletado com sucesso`
+                message: `Veículo deletado com sucesso`
             })
         } 
         catch(error){
@@ -68,9 +74,10 @@ export default class carController{
 
     static async create(req,res){
         try{
-            const {marca,modelo,ano,placa,foto,id_usuario,id_tipo} = req.body
+            const {marca,modelo,ano,placa,foto,id_tipo} = req.body
+            const id_usuario = req.user.id
             
-            if(!marca || !modelo || !ano || !placa || !id_usuario || !id_tipo ){
+            if(!marca || !modelo || !ano || !placa || !id_tipo ){
                 return res.status(400).json({
                     message: 'Por favor preencha todos os campos obrigatórios.'
                 })
@@ -96,13 +103,6 @@ export default class carController{
                 return res.status(400).json({
                     message: 'Formato de placa inválido. Use o formato ABC1234 ou ABC1D23'
                 })
-            }
-
-            const userValidate = await User.getOne(id_usuario)
-            if(!userValidate){
-                return res.status(404).json({
-                    message: 'Usuário não encontrado'
-                }) 
             }
 
             const typeVehicle = await Type.getOne(id_tipo)
@@ -142,6 +142,7 @@ export default class carController{
         try{
             const {id} = req.params
             const {placa, foto} = req.body
+            const userId = req.user.id
 
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
@@ -149,7 +150,7 @@ export default class carController{
                 })
             }
 
-            const carExist = await Veiculo.getOne(id)
+            const carExist = await Veiculo.getOneByUser(id, userId)
             if(!carExist){
                 return res.status(404).json({
                     message: 'Veículo não encontrado.'

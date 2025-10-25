@@ -5,9 +5,27 @@ export class Veiculo{
         const [rows] = await connection.execute('SELECT * FROM veiculos')
         return rows
     }
+
+    // 🔒 Método para buscar carros de um usuário específico
+    static async getByUserId(userId){
+        const [rows] = await connection.execute(
+            'SELECT * FROM veiculos WHERE id_usuario = ? ORDER BY created_at DESC',
+            [userId]
+        )
+        return rows
+    }
     
     static async getOne(id){
         const [data] = await connection.execute('SELECT * FROM veiculos WHERE id = ?', [id])
+        return data[0]
+    }
+
+    // 🔒 Método para buscar carro específico de um usuário
+    static async getOneByUser(id, userId){
+        const [data] = await connection.execute(
+            'SELECT * FROM veiculos WHERE id = ? AND id_usuario = ?',
+            [id, userId]
+        )
         return data[0]
     }
     

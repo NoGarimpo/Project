@@ -1,5 +1,6 @@
 import { User } from '../models/user.js'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 export default class userController{
     static async getAll(req,res){
@@ -68,10 +69,17 @@ export default class userController{
             
             const newUser = await User.create(nome, email, hashedPassword)
             
+            const token = jwt.sign(
+                { id: newUser.insertId, nome, email, role: 'cliente' },
+                process.env.JWT_SECRET,
+                { expiresIn: '3d' }
+            )
+
             res.status(201).json({
                 message: 'Usuário criado com sucesso',
                 user: {
                     nome,
+                    token: token,
                     email
                 }
             })
@@ -93,6 +101,12 @@ export default class userController{
         try{
             const {id} = req.params
             const {nome, email, senha} = req.body
+            
+            if(parseInt(id) !== req.user.id){
+                return res.status(403).json({
+                    message: 'Você só pode editar seu próprio perfil'
+                })
+            }
             
             if(!nome || !email){
                 return res.status(400).json({
@@ -150,6 +164,52 @@ export default class userController{
                 user: {
                     nome,
                     email
+                }
+            })
+
+        } 
+        catch(error){
+            res.status(500).json({ message: 'Erro interno do servidor' })
+        }
+    }
+
+    static  async login(req,res){
+        try{
+            const {email,senha} = req.body
+
+            if(email.trim() === '' || senha.trim() === ''){
+                return res.status(400).json({
+                    message: 'Digite corretamente os campos'
+                })
+            }
+
+            if(senha.length < 6){
+                return res.status(400).json({
+                    message: 'Senha deve ter pelo menos 6 caracteres'
+                })
+            }
+
+            const user = await User.userexist(email)
+
+            if(!user){
+                return res.status(401).json({ message: 'Email ou senha incorretos.' })
+            }
+
+            const passwordVerify = await bcrypt.compare(senha, user.senha)
+
+            if(!passwordVerify) {
+                return res.status(401).json({ message: 'Email ou senha incorretos.' })
+            }
+
+            const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email, role: user.role }, process.env.JWT_SECRET, {expiresIn: '3d'})
+
+            res.status(201).json({    
+                message: 'Login realizado com sucesso',
+                token: token,
+                user: {
+                    id: user.id,
+                    nome: user.nome,
+                    email: user.email
                 }
             })
 

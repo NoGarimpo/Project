@@ -36,4 +36,10 @@ export class User {
         return data
     }
 
+    static async userexist(email){
+        const [data] = await connection.execute(
+            'SELECT * from usuarios WHERE email = ?',[email]
+        )
+        return data[0]
+    }
 }

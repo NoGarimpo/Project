@@ -3,7 +3,9 @@ import { Appointment } from "../models/Appointment.js"
 export default class appointmentController{
     static async getAll(req,res){
         try{
-            const data = await Appointment.getAll()
+            const userId = req.user.id
+            
+            const data = await Appointment.getByUserId(userId)
 
             if(!data || data.length === 0){
                 return res.status(404).json({
@@ -21,6 +23,8 @@ export default class appointmentController{
     static async getOne(req,res){
         try{
             const {id} = req.params
+            const userId = req.user.id
+            const userRole = req.user.role
 
             if(!id || isNaN(id)){
                 return res.status(400).json({
@@ -28,11 +32,17 @@ export default class appointmentController{
                 })
             }
 
-            const data = await Appointment.getOne(id)
+            let data;
 
-            if(!data || data.length === 0){
+            if(userRole === 'funcionario' || userRole === 'admin'){
+                data = await Appointment.getOne(id)
+            } else{
+                data = await Appointment.getOneByUser(id, userId)
+            }
+
+            if(!data){
                 return res.status(404).json({
-                    message: 'agendamento não encontrado'
+                    message: 'Agendamento não encontrado'
                 })
             }
 
@@ -45,11 +55,17 @@ export default class appointmentController{
 
     static async getToday(req,res){
         try{
+            if(req.user.role !== 'funcionario' && req.user.role !== 'admin'){
+                return res.status(403).json({
+                    message: 'Acesso negado. Apenas funcionários podem ver a agenda completa.'
+                })
+            }
+
             const data = await Appointment.getToday()
 
             if(!data || data.length === 0){
                 return res.status(404).json({
-                    message: 'agendamento não encontrado'
+                    message: 'Nenhum agendamento encontrado para hoje'
                 })
             }
 
@@ -62,11 +78,12 @@ export default class appointmentController{
 
     static async create(req,res){
         try{
-            const { id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos, observacoes } = req.body
-
-            if(!id_usuario || !id_veiculo || !data_agendamento || !preco_total || !duracao_total_minutos || !servicos){
+            const { id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos, observacoes } = req.body
+            const id_usuario = req.user.id
+            
+            if(!id_veiculo || !data_agendamento || !preco_total || !duracao_total_minutos || !servicos){
                 return res.status(400).json({
-                    message: 'Campos obrigatórios: id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos'
+                    message: 'Campos obrigatórios: id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos'
                 })
             }
 
@@ -77,7 +94,7 @@ export default class appointmentController{
             }
 
             const agendamento_id = await Appointment.create(
-                id_usuario, 
+                id_usuario,
                 id_veiculo, 
                 data_agendamento, 
                 preco_total, 
@@ -100,6 +117,7 @@ export default class appointmentController{
         try{
             const { id } = req.params
             const { status } = req.body
+            const userId = req.user.id
 
             if(!id || isNaN(id)){
                 return res.status(400).json({
@@ -117,6 +135,13 @@ export default class appointmentController{
             if(!validStatus.includes(status)){
                 return res.status(400).json({
                     message: 'Status deve ser: agendado, em_andamento, concluido ou cancelado'
+                })
+            }
+
+            const appointment = await Appointment.getOneByUser(id, userId)
+            if(!appointment){
+                return res.status(404).json({
+                    message: 'Agendamento não encontrado'
                 })
             }
 
