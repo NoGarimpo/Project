@@ -6,6 +6,7 @@ const rota = Router()
 
 rota.post('/createUser', userController.create)
 rota.post('/login', userController.login)
+rota.post('/logout', userController.logout)
 
 rota.get('/getUsers', authenticate, userController.getAll)
 rota.get('/getUser/:id', authenticate, userController.getOne)

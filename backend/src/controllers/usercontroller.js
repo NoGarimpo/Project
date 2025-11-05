@@ -173,7 +173,7 @@ export default class userController{
         }
     }
 
-    static  async login(req,res){
+    static async login(req,res){
         try{
             const {email,senha} = req.body
 
@@ -216,6 +216,19 @@ export default class userController{
         } 
         catch(error){
             res.status(500).json({ message: 'Erro interno do servidor' })
+        }
+    }
+
+    static async logout(req,res){
+        try {
+            res.status(200).json({ 
+                message: 'Logout realizado com sucesso' 
+            })
+
+        } catch (error) {
+            res.status(500).json({ 
+                message: 'Erro interno do servidor' 
+            })
         }
     }
 }
