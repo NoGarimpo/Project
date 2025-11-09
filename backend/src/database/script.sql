@@ -79,6 +79,7 @@ CREATE TABLE agendamentos (
     id_usuario INT NOT NULL,
     id_veiculo INT NOT NULL,
     data_agendamento DATETIME NOT NULL,
+    data_termino_estimada DATETIME NOT NULL,
     preco_total DECIMAL(10,2) NOT NULL,
     duracao_total_minutos INT NOT NULL,
     status ENUM('agendado', 'em_andamento', 'concluido', 'cancelado') DEFAULT 'agendado',
@@ -104,6 +105,7 @@ CREATE TABLE agendamento_servicos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_agendamentos_data ON agendamentos(data_agendamento);
+CREATE INDEX idx_agendamentos_data_termino ON agendamentos(data_termino_estimada);
 CREATE INDEX idx_agendamentos_status ON agendamentos(status);
 CREATE INDEX idx_veiculos_usuario ON veiculos(id_usuario);
 CREATE INDEX idx_veiculos_tipo ON veiculos(id_tipo_veiculo);
@@ -114,52 +116,96 @@ CREATE INDEX idx_preco_servicos_tipo_veiculo ON preco_servicos(id_tipo_veiculo);
 
 -- Categorias
 INSERT INTO categorias (nome, descricao) VALUES
-('Limpeza e Higienização', 'Serviços de limpeza completa e higienização'),
-('Polimento', 'Serviços de polimento e recuperação da pintura'),
-('Vitrificação', 'Proteção avançada da pintura'),
-('Detalhamento', 'Serviços completos de detalhamento automotivo'),
-('Proteção', 'Serviços de proteção e conservação');
+('Lavagem', 'Serviços de limpeza e lavagem automotiva'),
+('Polimento', 'Serviços de polimento e correção de pintura'),
+('Vitrificação', 'Proteção cerâmica avançada'),
+('Pintura', 'Serviços especializados de pintura'),
+('Pacotes', 'Pacotes completos de serviços');
 
 -- Tipos de Veículo
 INSERT INTO tipos_veiculo (nome, descricao) VALUES
 ('Moto', 'Motocicletas em geral'),
 ('Carro', 'Carros de passeio em geral'),
 ('Caminhonete', 'Picapes e caminhonetes'),
-('Van', 'Vans e utilitários'),
-('Caminhão', 'Caminhões e veículos pesados');
+('SUV', 'Carros maiores');
 
--- Serviços de exemplo
+-- Serviços reais da estética
 INSERT INTO servicos (id_categoria, nome, descricao) VALUES
-(1, 'Lavagem Técnica Simples', 'Lavagem externa com shampoo automotivo'),
-(1, 'Lavagem Técnica Detalhada', 'Lavagem completa externa e interna'),
-(1, 'Higienização Completa', 'Limpeza profunda de estofados e carpetes'),
-(2, 'Polimento Técnico', 'Polimento para remoção de riscos leves'),
-(2, 'Polimento Pesado', 'Polimento para correção de pintura'),
-(3, 'Vitrificação Básica', 'Proteção cerâmica básica'),
-(3, 'Vitrificação Premium', 'Proteção cerâmica premium com garantia estendida');
+-- Lavagem
+(1, 'Lavagem Simples', 'Lavagem externa básica'),
+(1, 'Lavagem Completa', 'Lavagem completa externa e interna'),
+(1, 'Lavagem Detalhada', 'Lavagem detalhada deixando o veiculo na risca'),
 
--- Matriz de preços (exemplo para alguns serviços)
+-- Polimento
+(2, 'Polimento Comercial', 'Polimento básico para veículos comerciais'),
+(2, 'Polimento Técnico', 'Polimento técnico profissional completo'),
+(2, 'Polimento de Farol', 'Restauração e polimento de faróis'),
+
+-- Vitrificação 
+(3, 'Vitrificação', 'Proteção cerâmica premium completa'),
+
+-- Pintura
+(4, 'Pintura de Roda', 'Pintura especializada de rodas'),
+
+-- Pacotes
+(5, 'Pacote Ruby', 'Pacote completo com todos os serviços da estética: lavagem detalhada + polimento técnico + vitrificação + extras');
+
+-- Matriz de preços dos serviços reais
 INSERT INTO preco_servicos (id_servico, id_tipo_veiculo, preco, duracao_minutos) VALUES
--- Lavagem Técnica Simples
-(1, 1, 25.00, 30),   -- Moto
-(1, 2, 40.00, 60),   -- Carro
-(1, 3, 60.00, 90),   -- Caminhonete
-(1, 4, 70.00, 105),  -- Van
-(1, 5, 100.00, 150), -- Caminhão
 
--- Lavagem Técnica Detalhada
-(2, 1, 45.00, 60),   -- Moto
-(2, 2, 70.00, 120),  -- Carro
-(2, 3, 100.00, 180), -- Caminhonete
-(2, 4, 120.00, 210), -- Van
-(2, 5, 180.00, 300), -- Caminhão
+-- Lavagem Simples
+(1, 1, 60.00, 30),    -- Moto
+(1, 2, 100.00, 40),   -- Carro
+(1, 3, 150.00, 180),   -- Caminhonete
+(1, 4, 145.00, 175),   -- SUV
+
+-- Lavagem Completa
+(2, 1, 150.00, 75),   -- Moto (menor)
+(2, 2, 200.00, 90),   -- Carro
+(2, 3, 400.00, 360),  -- Caminhonete
+(2, 4, 390.00, 355),  -- SUV
+
+-- Lavagem Detalhada
+(3, 1, 350.00, 150),  -- Moto (menor)
+(3, 2, 450.00, 180),  -- Carro
+(3, 3, 800.00, 480),  -- Caminhonete
+(3, 4, 790.00, 475),  -- SUV
+
+-- Polimento Comercial
+(4, 1, 300.00, 2880), -- Moto
+(4, 2, 400.00, 2880), -- Carro
+(4, 3, 500.00, 4320), -- Caminhonete
+(4, 4, 495.00, 4290), -- SUV
 
 -- Polimento Técnico
-(4, 1, 80.00, 90),   -- Moto
-(4, 2, 150.00, 180), -- Carro
-(4, 3, 220.00, 270), -- Caminhonete
-(4, 4, 280.00, 330), -- Van
-(4, 5, 400.00, 480); -- Caminhão
+(5, 1, 900.00, 5760),  -- Moto
+(5, 2, 1200.00, 5760), -- Carro
+(5, 3, 1300.00, 7200), -- Caminhonete
+(5, 4, 1290.00, 7170), -- SUV
+
+-- Polimento de Farol
+(6, 1, 120.00, 60),   -- Moto (menor)
+(6, 2, 150.00, 90),   -- Carro
+(6, 3, 180.00, 120),  -- Caminhonete
+(6, 4, 175.00, 115),  -- SUV
+
+-- Vitrificação
+(7, 1, 800.00, 480),  -- Moto
+(7, 2, 1200.00, 720), -- Carro
+(7, 3, 1500.00, 900), -- Caminhonete
+(7, 4, 1480.00, 890), -- SUV
+
+-- Pintura de Roda
+(8, 1, 300.00, 2880), -- Moto
+(8, 2, 500.00, 2880), -- Carro
+(8, 3, 600.00, 2880), -- Caminhonete
+(8, 4, 590.00, 2880), -- SUV
+
+-- Pacote Ruby (Completo: lavagem + polimento + vitrificação + extras)
+(9, 1, 1500.00, 5760),  -- Moto
+(9, 2, 2000.00, 10080), -- Carro
+(9, 3, 3500.00, 14400), -- Caminhonete
+(9, 4, 3400.00, 14100); -- SUV
 
 -- View para facilitar consulta de preços
 CREATE VIEW view_precos_servicos AS
@@ -183,6 +229,7 @@ CREATE VIEW view_agenda_diaria AS
 SELECT 
     a.id as id_agendamento,
     a.data_agendamento,
+    a.data_termino_estimada,
     a.status,
     u.nome as nome_cliente,
     v.marca,

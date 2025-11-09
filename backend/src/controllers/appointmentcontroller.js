@@ -89,7 +89,24 @@ export default class appointmentController{
 
             if(!Array.isArray(servicos) || servicos.length === 0){
                 return res.status(400).json({
-                    message: 'servicos deve ser um array com pelo menos um item'
+                    message: 'Pelo menos 1 item precisa ter.'
+                })
+            }
+
+            const dataAgendamento = new Date(data_agendamento)
+            
+            // Verificar limite diário de agendamentos
+            const checagemLimite = await Appointment.getByDate(dataAgendamento)
+            if(checagemLimite.length > 3){
+                return res.status(409).json({
+                    message: `Estética já tem 4 agendamentos para o dia. Escolha outra data.`
+                })
+            }
+
+            const podeAgendar = await Appointment.checkPacoteRubyWeekLimit(data_agendamento, servicos)
+            if(podeAgendar.length > 0) {
+                return res.status(409).json({
+                    message: 'Já existe um agendamento com Pacote Ruby nesta semana. Apenas 1 Pacote Ruby por semana é permitido.'
                 })
             }
 

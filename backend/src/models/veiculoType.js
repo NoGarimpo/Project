@@ -8,6 +8,6 @@ export class Type{
 
     static async getOne(id){
         const [data] = await connection.execute('SELECT * FROM tipos_veiculo WHERE id = ?', [id])
-        return data
+        return data[0]
     }
 }

@@ -32,10 +32,10 @@ export class Veiculo{
         return data
     }
 
-    static async create(marca,modelo,ano,placa,foto,id_usuario,id_tipo){
+    static async create(marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo){
         const [data] = await connection.execute(
             'INSERT INTO veiculos(marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo) VALUES(?,?,?,?,?,?,?)',
-            [marca,modelo,ano,placa,foto,id_usuario,id_tipo]
+            [marca,modelo,ano,placa,foto,id_usuario,id_tipo_veiculo]
         )
         return data
     }

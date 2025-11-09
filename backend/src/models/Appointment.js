@@ -25,6 +25,14 @@ export class Appointment{
         return rows
     }
 
+    static async getByDate(date){
+        const [rows] = await connection.execute(
+            'SELECT * FROM agendamentos WHERE DATE(data_agendamento) = ? ORDER BY data_agendamento',
+            [date]
+        )
+        return rows
+    }
+
     static async getOne(id){
         const [data] = await connection.execute('SELECT * FROM agendamentos WHERE id = ?', [id])
         return data[0]
@@ -39,11 +47,14 @@ export class Appointment{
     }
 
     static async create(id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, servicos, observacoes = null){
+        const dataInicio = new Date(data_agendamento)
+        const dataTerminoEstimada = new Date(dataInicio.getTime() + (duracao_total_minutos * 60 * 1000))
+        
         const [data] = await connection.execute(
             `INSERT INTO agendamentos 
-            (id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, observacoes) 
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [id_usuario, id_veiculo, data_agendamento, preco_total, duracao_total_minutos, observacoes]
+            (id_usuario, id_veiculo, data_agendamento, data_termino_estimada, preco_total, duracao_total_minutos, observacoes) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [id_usuario, id_veiculo, data_agendamento, dataTerminoEstimada, preco_total, duracao_total_minutos, observacoes]
         )
         
         const agendamento_id = data.insertId
@@ -82,5 +93,25 @@ export class Appointment{
         
         const [data] = await connection.execute(updateQuery, params)
         return data
+    }
+
+    static async checkPacoteRubyWeekLimit(data_agendamento, servicos){
+        const temPacoteRuby = servicos.includes(9)
+        
+        if(!temPacoteRuby) {
+            return [] // Array vazio = pode agendar
+        }
+
+        const [rows] = await connection.execute(`
+            SELECT a.id, a.data_agendamento
+            FROM agendamentos a
+            JOIN agendamento_servicos ash ON a.id = ash.id_agendamento  
+            JOIN preco_servicos ps ON ash.id_preco_servico = ps.id
+            WHERE ps.id_servico = 9
+            AND a.status IN ('agendado', 'em_andamento', 'concluido')
+            AND YEARWEEK(a.data_agendamento, 1) = YEARWEEK(?, 1)
+        `, [data_agendamento])
+        
+        return rows
     }
 }
