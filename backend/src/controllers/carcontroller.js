@@ -1,6 +1,7 @@
 import { Veiculo } from '../models/car.js'
 import { User } from '../models/user.js'
 import { Type } from "../models/veiculoType.js"
+import { deleteOldImage } from '../middlewares/upload.js'
 
 export default class carController{
     static async getAll(req,res){
@@ -61,6 +62,11 @@ export default class carController{
                 })
             }
 
+            // Deletar a foto se existir
+            if (car.foto) {
+                deleteOldImage(car.foto)
+            }
+
             await Veiculo.delete(id)
             res.status(200).json({
                 message: `Veículo deletado com sucesso`
@@ -73,8 +79,14 @@ export default class carController{
 
     static async create(req,res){
         try{
-            const {marca,modelo,ano,placa,foto,id_tipo} = req.body
+            const {marca,modelo,ano,placa,id_tipo} = req.body
             const id_usuario = req.user.id
+            
+            // Processar upload de imagem se existir
+            let foto = null
+            if (req.file) {
+                foto = `/uploads/cars/${req.file.filename}`
+            }
             
             if(!marca || !modelo || !ano || !placa || !id_tipo ){
                 return res.status(400).json({
@@ -127,7 +139,8 @@ export default class carController{
                     marca,
                     modelo,
                     ano: anoInt,
-                    placa: placaUpper
+                    placa: placaUpper,
+                    foto: foto
                 }
             })
 
@@ -140,8 +153,14 @@ export default class carController{
     static async update(req,res){
         try{
             const {id} = req.params
-            const {placa, foto} = req.body
+            const {placa} = req.body
             const userId = req.user.id
+            
+            // Processar upload de nova imagem se existir
+            let novaFoto = null
+            if (req.file) {
+                novaFoto = `/uploads/cars/${req.file.filename}`
+            }
 
             if(!id || isNaN(id)){
                 return res.status(400).json({ 
@@ -183,16 +202,25 @@ export default class carController{
             }
 
             const placaFinal = placaMudou ? placaNormalizada : carExist.placa
+            
+            // Se houver nova foto, deletar a antiga
+            if (novaFoto && carExist.foto) {
+                deleteOldImage(carExist.foto)
+            }
+            
+            // Determinar qual foto usar
+            const fotoFinal = novaFoto || carExist.foto
 
-            await Veiculo.update(id, placaFinal, foto)
+            await Veiculo.update(id, placaFinal, fotoFinal)
 
             res.status(200).json({
                 message: 'Veículo atualizado com sucesso',
                 veiculo: {
                     id: parseInt(id),
                     placa: placaFinal,
-                    foto: foto,
-                    placaAlterada: placaMudou
+                    foto: fotoFinal,
+                    placaAlterada: placaMudou,
+                    fotoAlterada: !!novaFoto
                 }
             })
 
