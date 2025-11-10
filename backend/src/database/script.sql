@@ -30,19 +30,47 @@ CREATE TABLE tipos_veiculo (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE marcas_veiculo (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    marca VARCHAR(80) NOT NULL,
+    id_tipo_veiculo INT NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (id_tipo_veiculo) REFERENCES tipos_veiculo(id) ON DELETE RESTRICT,
+    UNIQUE KEY unique_marca_tipo (marca, id_tipo_veiculo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE modelos_veiculo (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    modelo VARCHAR(80) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    id_marca_veiculo INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_marca_veiculo) REFERENCES marcas_veiculo(id) ON DELETE RESTRICT,
+    UNIQUE KEY unique_modelo_marca (modelo, id_marca_veiculo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE veiculos (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    marca VARCHAR(50) NOT NULL,
-    modelo VARCHAR(50) NOT NULL,
+    marca VARCHAR(70) NULL,
+    modelo VARCHAR(50) NULL,
     ano YEAR NOT NULL,
     placa VARCHAR(10) UNIQUE NOT NULL,
     foto VARCHAR(255) NULL,
+    id_marca_veiculo INT NULL,
+    id_modelo_veiculo INT NULL,
     id_tipo_veiculo INT NOT NULL,
     id_usuario INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (id_tipo_veiculo) REFERENCES tipos_veiculo(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_modelo_veiculo) REFERENCES modelos_veiculo(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_marca_veiculo) REFERENCES marcas_veiculo(id) ON DELETE SET NULL,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -128,6 +156,195 @@ INSERT INTO tipos_veiculo (nome, descricao) VALUES
 ('Carro', 'Carros de passeio em geral'),
 ('Caminhonete', 'Picapes e caminhonetes'),
 ('SUV', 'Carros maiores');
+
+-- Marcas de Veículo por tipo
+INSERT INTO marcas_veiculo (marca, id_tipo_veiculo) VALUES
+-- Carros (tipo 2)
+('Chevrolet', 2),
+('Volkswagen', 2),
+('Ford', 2),
+('Fiat', 2),
+('Renault', 2),
+('Toyota', 2),
+('Honda', 2),
+('Hyundai', 2),
+('Nissan', 2),
+('Peugeot', 2),
+('Citroën', 2),
+('BMW', 2),
+('Mercedes-Benz', 2),
+('Audi', 2),
+('Volvo', 2),
+('Jaguar', 2),
+('Land Rover', 2),
+('Porsche', 2),
+-- Motos (tipo 1)
+('Yamaha', 1),
+('Honda', 1),
+('Suzuki', 1),
+('Kawasaki', 1),
+('BMW', 1),
+('Ducati', 1),
+('Harley-Davidson', 1),
+-- SUVs (tipo 4) - marcas que fazem SUVs
+('Chevrolet', 4),
+('Volkswagen', 4),
+('Ford', 4),
+('Toyota', 4),
+('Honda', 4),
+('Hyundai', 4),
+('Nissan', 4),
+('BMW', 4),
+('Mercedes-Benz', 4),
+('Audi', 4),
+('Volvo', 4),
+('Jaguar', 4),
+('Land Rover', 4),
+('Porsche', 4),
+-- Caminhonetes (tipo 3)
+('Chevrolet', 3),
+('Volkswagen', 3),
+('Ford', 3),
+('Fiat', 3),
+('Toyota', 3),
+('Nissan', 3);
+
+INSERT INTO modelos_veiculo (modelo, id_marca_veiculo) VALUES
+-- Chevrolet Carros (id=1)
+('Onix', 1),
+('Corsa', 1),
+('Prisma', 1),
+('Cruze', 1),
+-- Chevrolet SUVs (id=19)
+('Tracker', 19),
+-- Chevrolet Caminhonetes (id=31)  
+('S10', 31),
+-- Volkswagen Carros (id=2)
+('Gol', 2),
+('Polo', 2),
+('Virtus', 2),
+-- Volkswagen SUVs (id=20)
+('T-Cross', 20),
+-- Volkswagen Caminhonetes (id=32)
+('Amarok', 32),
+-- Ford
+('Ka', 3),
+('Fiesta', 3),
+('Focus', 3),
+('EcoSport', 3),
+('Ranger', 3),
+-- Fiat
+('Uno', 4),
+('Argo', 4),
+('Cronos', 4),
+('Toro', 4),
+('Strada', 4),
+-- Toyota
+('Corolla', 6),
+('Yaris', 6),
+('Hilux', 6),
+('RAV4', 6),
+('Camry', 6),
+-- Honda
+('Civic', 7),
+('City', 7),
+('HR-V', 7),
+('CR-V', 7),
+-- Motos Honda
+('CB 600F Hornet', 7),
+('CBR 600RR', 7),
+('CG 160', 7),
+('PCX 150', 7),
+-- Motos Yamaha
+('YZF-R1', 19),
+('MT-07', 19),
+('Fazer 250', 19),
+('NMAX 160', 19),
+-- BMW Carros
+('320i', 12),
+('X1', 12),
+('X3', 12),
+('Serie 1', 12),
+-- Renault
+('Sandero', 5),
+('Logan', 5),
+('Duster', 5),
+('Captur', 5),
+-- Hyundai
+('HB20', 8),
+('Creta', 8),
+('Tucson', 8),
+('Elantra', 8),
+-- Nissan
+('March', 9),
+('Versa', 9),
+('Kicks', 9),
+('Frontier', 9),
+-- Peugeot
+('208', 10),
+('2008', 10),
+('3008', 10),
+('Partner', 10),
+-- Citroën
+('C3', 11),
+('C4 Cactus', 11),
+('Aircross', 11),
+('Berlingo', 11),
+-- Mercedes-Benz
+('Classe A', 13),
+('Classe C', 13),
+('GLA', 13),
+('Sprinter', 13),
+-- Audi
+('A3', 14),
+('Q3', 14),
+('A4', 14),
+('Q5', 14),
+-- Volvo
+('XC40', 15),
+('XC60', 15),
+('S60', 15),
+('V40', 15),
+-- Jaguar
+('XE', 16),
+('F-Pace', 16),
+('XF', 16),
+('E-Pace', 16),
+-- Land Rover
+('Evoque', 17),
+('Discovery Sport', 17),
+('Defender', 17),
+('Velar', 17),
+-- Porsche
+('911', 18),
+('Cayenne', 18),
+('Macan', 18),
+('Panamera', 18),
+-- Suzuki Motos
+('GSX-R1000', 21),
+('V-Strom 650', 21),
+('Burgman 400', 21),
+('Intruder 250', 21),
+-- Kawasaki
+('Ninja ZX-10R', 22),
+('Versys 650', 22),
+('Z400', 22),
+('Vulcan 900', 22),
+-- BMW Motos
+('R1250GS', 23),
+('S1000RR', 23),
+('F750GS', 23),
+('R nineT', 23),
+-- Ducati
+('Panigale V4', 24),
+('Monster 821', 24),
+('Scrambler Icon', 24),
+('Multistrada V4', 24),
+-- Harley-Davidson
+('Street 750', 25),
+('Sportster Iron 883', 25),
+('Fat Boy', 25),
+('Road King', 25);
 
 -- Serviços reais da estética
 INSERT INTO servicos (id_categoria, nome, descricao) VALUES

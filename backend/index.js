@@ -11,6 +11,8 @@ import appointmentRouter from './src/routes/appointmentRoute.js'
 import serviceRouter from './src/routes/serviceRoute.js'
 import veiculoTypeRouter from './src/routes/veiculotype.js'
 import service_priceRouter from './src/routes/service_priceRoute.js'
+import marcaRouter from './src/routes/marcaRoute.js'
+import modeloRouter from './src/routes/modeloRoute.js'
 
 const app = express()
 
@@ -27,6 +29,8 @@ app.use(cors({
     origin: 'http://localhost:5173'
 }))
 
+app.use('/uploads', express.static('uploads'))
+
 app.use('/user', userRouter)
 app.use('/car', veiculoRouter)
 app.use('/category', categoryRouter)
@@ -34,6 +38,8 @@ app.use('/appointment', appointmentRouter)
 app.use('/service', serviceRouter)
 app.use('/vehicletype', veiculoTypeRouter)
 app.use('/prices', service_priceRouter)
+app.use('/marcas', marcaRouter)
+app.use('/modelos', modeloRouter)
 
 app.listen(process.env.PORT, async (error)=>{
     if(error){
