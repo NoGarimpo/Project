@@ -3,7 +3,6 @@ import marcaController from '../controllers/marcacontroller.js'
 
 const rota = Router()
 
-// GET /api/marcas/marca?tipo_veiculo=1 - Marcas filtradas por tipo
-rota.get('/marca', marcaController.getByTipo)
+rota.get('/', marcaController.getAll)
 
 export default rota

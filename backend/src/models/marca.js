@@ -13,11 +13,10 @@ export class Marca {
 
     static async getAll() {
         const [rows] = await connection.execute(`
-            SELECT m.id, m.marca, tv.nome as tipo_veiculo
+            SELECT m.id, m.marca 
             FROM marcas_veiculo m
-            JOIN tipos_veiculo tv ON m.id_tipo_veiculo = tv.id
             WHERE m.ativo = TRUE 
-            ORDER BY tv.nome ASC, m.marca ASC
+            ORDER BY m.marca ASC
         `);
         return rows;
     }
