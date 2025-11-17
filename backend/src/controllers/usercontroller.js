@@ -79,6 +79,7 @@ export default class userController{
                 message: 'Usuário criado com sucesso',
                 user: {
                     nome,
+                    role: 'cliente',
                     token: token,
                     email
                 }
@@ -163,7 +164,8 @@ export default class userController{
                 message: 'Usuário atualizado com sucesso',
                 user: {
                     nome,
-                    email
+                    email,
+                    role: userExist.role
                 }
             })
 
@@ -209,7 +211,8 @@ export default class userController{
                 user: {
                     id: user.id,
                     nome: user.nome,
-                    email: user.email
+                    email: user.email,
+                    role: user.role
                 }
             })
 

@@ -50,6 +50,8 @@ const rota = Router()
  *                       type: string
  *                     email:
  *                       type: string
+ *                     role:
+ *                       type: string
  *                     token:
  *                       type: string
  *       400:
@@ -103,6 +105,8 @@ rota.post('/createUser', userController.create)
  *                     nome:
  *                       type: string
  *                     email:
+ *                       type: string
+ *                     role:
  *                       type: string
  *       400:
  *         description: Campos inválidos ou senha muito curta
@@ -203,6 +207,22 @@ rota.get('/getUser/:id', authenticate, userController.getOne)
  *     responses:
  *       200:
  *         description: Usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
  *       400:
  *         description: Campos obrigatórios faltando ou inválidos
  *       403:
