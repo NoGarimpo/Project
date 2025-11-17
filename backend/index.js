@@ -3,6 +3,7 @@ import 'dotenv/config'
 
 import cors from 'cors'
 import { conectar } from './src/database/conn.js'
+import { specs, swaggerUi } from './src/swagger.js'
 
 import userRouter from './src/routes/userRoute.js'
 import veiculoRouter from './src/routes/veiculoRoute.js'
@@ -30,6 +31,9 @@ app.use(cors({
 }))
 
 app.use('/uploads', express.static('uploads'))
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 app.use('/user', userRouter)
 app.use('/car', veiculoRouter)
